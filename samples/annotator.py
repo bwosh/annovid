@@ -12,7 +12,8 @@ from objects.bbox_list import  BBoxList
 from objects.image import Image
 
 class MaskRCNNBBoxAnnotator(BaseBBoxAnnotator):
-    def __init__(self):
+    def __init__(self, device="cuda"):
+        self.device = device
         self.classes = {
             1: "person",
             2: "bicycle",
@@ -25,12 +26,13 @@ class MaskRCNNBBoxAnnotator(BaseBBoxAnnotator):
         }
 
         self.model = maskrcnn_resnet50_fpn(pretrained=True)
+        self.model.to(self.device)
         self.model.eval()
 
     def to_tensor(self, img:Image)->torch.tensor:
         img = img.to_rgb()
         img = img.transpose(2,0,1)/255
-        return torch.tensor(img,dtype=torch.float)
+        return torch.tensor(img,dtype=torch.float).to(self.device)
 
     def get_bboxes(self, image: Image, score_threshold:float=0.3, nms_threshold:float=0.5)->BBoxList:
 

@@ -1,6 +1,8 @@
-# ANNOVID v.0.2
+# ANNOVID v.0.3
 
-The projects is set of tools prepared for pre- or postprocessing data in Computer Vision domain. Fow images aw well as videos. Main goal is to have codebase for repetetive tasks in many projects. 
+The projects is set of tools prepared for pre- or postprocessing data in Computer Vision domain. Fow images aw well as videos. Main goal is to have codebase for repetetive tasks in many projects.  
+
+**STATUS**: Things to be done marked in the code.  
 
 # Demo 
 
@@ -8,22 +10,17 @@ For showcase/reference please go to **[DEMO](./demo.ipynb) notebook**.
 Check samples below for an idea:  
 
 **Fast video annotation**:  
-![bbox sample](./assets/video_bbox.png)
+![detections](./assets/video_bbox.png)
 *Frame from video: https://www.youtube.com/watch?v=MNn9qKG2UFI which was used during tests in ths project.* 
 
 **Object apperance heatmaps**:  
-![bbox sample](./assets/heatmap.png)
+![heatmap](./assets/heatmap.png)
+
+**Plot of object count**:  
+![plot](./assets/plot.png)
 
 **Ultra-quick baseline annotations**:  
 ![bbox sample](./assets/bbox.png)
-
-# Status/Things to be done
-- visualuzation: processing images/folders/videos
-- visualuzation:  video **heatmaps**
- - setup file for making library
- - (optionally) publishing to PyPI
-
- refer do "TODO"-s in code for more.
 
 # Features 
 The code addresses taksks like:
@@ -31,6 +28,7 @@ The code addresses taksks like:
 - image **cropping** & **scaling**
 - **bbox** notation standarization
 - video heatmaps  
+- caching detections to pickle file
 
 Visual helper methods include:
 - bounding box drawing
@@ -41,6 +39,7 @@ Code uses Python 3 syntax.
 **Core code uses:**  
 - [OpenCV](https://pypi.org/project/opencv-python/)
 - [numpy](https://pypi.org/project/numpy/) 
+- [matplotlib](https://pypi.org/project/matplotlib/) 
 - [Pillow](https://pypi.org/project/tqdm/)
 - [tqdm](https://pypi.org/project/tqdm/)
 
