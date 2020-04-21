@@ -12,6 +12,13 @@ class BBoxList:
     def __len__(self):
         return len(self.data)
 
+    def reduce_to_classes(self, class_list):
+        new_data = []
+        for d in self.data:
+            if d.class_name in class_list:
+                new_data.append(d)
+        self.data = new_data
+
     def append(self, bbox: BBox):
         self.data.append(bbox)
 
@@ -48,6 +55,10 @@ class BBoxListFrames:
 
     def append(self, bbox_list: BBoxList):
         self.data.append(bbox_list)
+
+    def reduce_to_classes(self, class_list):
+        for d in self.data:
+            d.reduce_to_classes(class_list)
 
     def __getitem__(self, index):
         return self.data[index]

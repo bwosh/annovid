@@ -1,18 +1,24 @@
-# ANNOVID v.0.1
+# ANNOVID v.0.2
 
-The projects is set of tools prepared for pre- or postprocessing data in Computer Vision domain. Main goal is to have codebase for repetetive tasks in projects. There are methods for images & videos.
+The projects is set of tools prepared for pre- or postprocessing data in Computer Vision domain. Fow images aw well as videos. Main goal is to have codebase for repetetive tasks in many projects. 
 
 # Demo 
 
 For showcase/reference please go to **[DEMO](./demo.ipynb) notebook**.  
 Check samples below for an idea:  
 
+**Fast video annotation**:  
+![bbox sample](./assets/video_bbox.png)
+*Frame from video: https://www.youtube.com/watch?v=MNn9qKG2UFI which was used during tests in ths project.* 
+
+**Object apperance heatmaps**:  
+![bbox sample](./assets/heatmap.png)
+
 **Ultra-quick baseline annotations**:  
 ![bbox sample](./assets/bbox.png)
 
 # Status/Things to be done
 - visualuzation: processing images/folders/videos
-- visualuzation: creating images/frames preview maps 
 - visualuzation:  video **heatmaps**
  - setup file for making library
  - (optionally) publishing to PyPI
@@ -24,6 +30,7 @@ The code addresses taksks like:
 - image **representations** (PIL/OpenCV/RGB vs BRG issues)
 - image **cropping** & **scaling**
 - **bbox** notation standarization
+- video heatmaps  
 
 Visual helper methods include:
 - bounding box drawing
@@ -42,4 +49,5 @@ Code uses Python 3 syntax.
 
 # License
 This code is licensed with [Apache License Version 2.0](./LICENSE).  
-Used libraries might by licensed other way. Please mind reviewing them before using.
+Original author: Błażej Matuszewski, repository: [bwosh/annovid](https://github.com/bwosh/annovid).  
+Used libraries are licensed separately. Please review them as well.

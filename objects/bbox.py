@@ -15,6 +15,9 @@ class BBox:
 
     def clip(self, min_x:float=0.0, min_y:float=0.0, max_x:float=224.0, max_y:float=224.0):
         self.x1 = max(min(max_x, self.x1), min_x)
+        self.y1 = max(min(max_y, self.y1), min_y)
+        self.x2 = max(min(max_x, self.x2), min_x)
+        self.y2 = max(min(max_y, self.y2), min_y)
 
     def __repr__(self):
         return f"BBox [({self.x1:0.2f},{self.y1:0.2f})-({self.x2:0.2f}),{self.y2:0.2f}) score={self.score:0.2f} class={self.class_id}/{self.class_name}] "

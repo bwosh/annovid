@@ -1,2 +1,1 @@
-# TODO heatmaps
 # TODO tracking
