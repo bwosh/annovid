@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from objects.bbox_list import BBoxListFrames
 from objects.image import Image
+from base.groupping import KnownBBoxList
 
 class VideoAnnotator:
     def __init__(self, annotator):
@@ -46,7 +47,7 @@ class VideoAnnotator:
 
         return result
 
-    def render(self, path:str, data:BBoxListFrames, output_path:str):
+    def render(self, path:str, data:BBoxListFrames, output_path:str, known_bboxes:KnownBBoxList=None):
         reader = skvideo.io.FFmpegReader(path)
         writer = skvideo.io.FFmpegWriter(output_path)
         frame_idx = 0
@@ -57,7 +58,12 @@ class VideoAnnotator:
             img = Image.from_rgb_array(frame)
             if self.frame_preprocessing is not None:
                 img = self.frame_preprocessing(img)
-            img = detections.draw_on(img).to_rgb()
+
+            additional_data = None
+            if known_bboxes is not None:
+                additional_data = [known_bboxes.get_group_id(frame_idx, bbox) for bbox in detections]
+                additional_data = ["-" if a is None else str(a) for a in additional_data]
+            img = detections.draw_on(img, additional_data = additional_data).to_rgb()
 
             writer.writeFrame(img)
             frame_idx+=1
@@ -126,7 +132,5 @@ class VideoAnnotator:
 
         return img
 
-        
-    # TODO groupping detections
     # TODO tracking lines
     # TODO applying insight video (plots on videos)

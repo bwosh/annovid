@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from objects.bbox_list import BBoxListFrames
 from objects.bbox import BBox
 
@@ -11,13 +13,20 @@ class KnownBBox:
         new_entry = (bbox, frame_index)
         self.bbox_history.append(new_entry)
         self.full_bbox_history.append(new_entry)
-        self.bbox_history = self.bbox_history[-self.history_length,:]
+        self.bbox_history = self.bbox_history[-self.history_length:]
+        # TODO add interpolation for missing frames ?
 
     def get_total_occurences(self):
         return len(self.full_bbox_history)
 
+    def contains(self, frame_index:int, bbox:BBox):
+        for bb,idx in self.full_bbox_history:
+            if bb.equals(bbox) and idx==frame_index: 
+                return True
+        return False
+
     def get_match_score(self, frame_index:int, other_bbox:BBox, allowed_history_length=1):
-        loops = min(allowed_history_length, self.history_length)
+        loops = min(allowed_history_length, len(self.bbox_history))
 
         for i in range(loops):
             historical_bbox, historical_frame  = self.bbox_history[-i]
@@ -28,14 +37,56 @@ class KnownBBox:
                     return iou
             else:
                 return 0.0
-    return 0.0
+        return 0.0
+
+class KnownBBoxList:
+    def __init__(self):
+        self.data = []
+
+    def __len__(self):
+        return len(self.data)
+
+    def append(self, bbox_list: KnownBBox):
+        self.data.append(bbox_list)
+
+    def __getitem__(self, index):
+        return self.data[index]
+
+    def get_group_id(self, frame_index:int, bbox:BBox):
+        for g_idx, group in enumerate(self.data):
+            if group.contains(frame_index, bbox):
+                return g_idx
+        return None
+
+    def __repr__(self):
+        result = f"KnownBBoxList with {len(self.data)} bboxes"
+        return result
 
 class BBoxGroupping:
     def __init__(self, frames_with_detections:BBoxListFrames):
         self.data = frames_with_detections
-        self.known_boxes = {}
 
     def group(self, iou_threshold:float, fill_missing_frames:int=0)->BBoxListFrames:
-        result = BBoxListFrames()
+        history_length = fill_missing_frames+1
 
-        return result
+        # Gether boxes
+        known_boxes = KnownBBoxList()
+        for frame_id, frame_with_detections in enumerate(tqdm(self.data)):
+            for bbox_idx, bbox in enumerate(frame_with_detections):
+                # find matching known box
+                matching_known_box_index = None
+
+                match_score = 0.0
+                best_score = 0.0
+                for kb_index, kb in enumerate(known_boxes):
+                    match_score = kb.get_match_score(frame_id, bbox, history_length)
+                    if match_score > iou_threshold and match_score>best_score:
+                        matching_known_box_index = kb_index
+
+                if matching_known_box_index is not None:
+                    known_boxes[matching_known_box_index].add_new_apperance(frame_id, bbox)
+                else:
+                    new_known_bbox = KnownBBox(frame_id, bbox, history_length)
+                    known_boxes.append(new_known_bbox)
+
+        return known_boxes

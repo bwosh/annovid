@@ -25,16 +25,20 @@ class BBoxList:
     def __getitem__(self, index):
         return self.data[index]
 
-    def draw_on(self, img: Image, line_thickness:int=1, font_scale:int=0.3, line_height=10, pretty=True)->Image:
+    def draw_on(self, img: Image, line_thickness:int=1, font_scale:int=0.3, line_height=10, pretty=True, additional_data=None)->Image:
         img = img.to_rgb()
 
         line_type = cv2.LINE_AA if pretty else cv2.LINE_4
 
-        for bbox in self.data:
+        for bbox_idx, bbox in enumerate(self.data):
             x1,y1,x2,y2 = bbox.to_int()
+            additional_text = ""
+
+            if additional_data is not None:
+                additional_text = ", ("+additional_data[bbox_idx]+")"
 
             cv2.rectangle(img,(x1,y1),(x2,y2), (0,255,0), line_thickness, line_type)
-            cv2.putText(img, f"{bbox.class_name}, {bbox.score:.2f}" , (x1+2,y1+line_height), cv2.FONT_HERSHEY_SIMPLEX , font_scale, (235,255,235), line_thickness, line_type)
+            cv2.putText(img, f"{bbox.class_name}, {bbox.score:.2f}{additional_text}" , (x1+2,y1+line_height), cv2.FONT_HERSHEY_SIMPLEX , font_scale, (235,255,235), line_thickness, line_type)
 
         return Image.from_rgb_array(img)
 
