@@ -13,6 +13,7 @@ class VideoAnnotator:
     def __init__(self, annotator):
         self.annotator = annotator
         self.frame_preprocessing = None
+        self.temp_file_name = 'plot_temp.png'
 
     def set_frame_preprocessing(self, preprocessing):
         self.frame_preprocessing = preprocessing
@@ -99,8 +100,32 @@ class VideoAnnotator:
             values.append(len(detections))
         plt.plot(self.moving_average(values, moving_avg))
         plt.title(title)
-        plt.savefig('plot_temp.png')
-        return Image.open('plot_temp.png')
+        plt.savefig(self.temp_file_name )
+        img = Image.open(self.temp_file_name)
+        os.remove(self.temp_file_name)
+
+        return img
+
+    def get_bar_count_plot(self, data:BBoxListFrames, bin_count=20, title="", size=(15,8)):
+        plt.figure(figsize=size)
+        values = []
+        for detections in data:
+            values.append(len(detections))
+    
+        target_size = len(values)-(len(values)%bin_count)
+        values = np.array(values[:target_size])
+        values = values.reshape(-1, bin_count)
+        values = values.mean(axis=1)
+
+        plt.bar(x=np.arange(0,len(values)), height=values)
+
+        plt.title(title)
+        plt.savefig(self.temp_file_name )
+        img = Image.open(self.temp_file_name)
+        os.remove(self.temp_file_name)
+
+        return img
+
         
     # TODO groupping detections
     # TODO tracking lines

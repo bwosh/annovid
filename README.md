@@ -19,6 +19,8 @@ Check samples below for an idea:
 **Plot of object count**:  
 ![plot](./assets/plot.png)
 
+**TODO Simple calculation of IOU (Intersection over Union) of two boxes**:
+
 **Ultra-quick baseline annotations**:  
 ![bbox sample](./assets/bbox.png)
 

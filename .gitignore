@@ -137,3 +137,13 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Videos
+*.mp4
+*.avi
+
+# Pickle data files
+*.pkl
+
+# Mac Os files
+*.DS_Store

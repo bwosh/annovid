@@ -19,5 +19,8 @@ class BBox:
         self.x2 = max(min(max_x, self.x2), min_x)
         self.y2 = max(min(max_y, self.y2), min_y)
 
+    def iou(self, other_bbox:BBox):
+        return 0.0 # TODO two boxes iou
+
     def __repr__(self):
         return f"BBox [({self.x1:0.2f},{self.y1:0.2f})-({self.x2:0.2f}),{self.y2:0.2f}) score={self.score:0.2f} class={self.class_id}/{self.class_name}] "
