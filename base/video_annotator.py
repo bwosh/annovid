@@ -1,3 +1,4 @@
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import skvideo.io
@@ -30,7 +31,7 @@ class VideoAnnotator:
         reader = skvideo.io.FFmpegReader(path)
         (numframe, _, _, _) = reader.getShape()
         frame_idx=0
-        for frame in tqdm(reader.nextFrame(), total=numframe):
+        for frame in tqdm(reader.nextFrame(), total=numframe, desc="Annotating video"):
             if maxframes is not None and frame_idx>=maxframes:
                 break
             img = Image.from_rgb_array(frame)
@@ -47,11 +48,11 @@ class VideoAnnotator:
 
         return result
 
-    def render(self, path:str, data:BBoxListFrames, output_path:str, known_bboxes:KnownBBoxList=None):
+    def render(self, path:str, data:BBoxListFrames, output_path:str, known_bboxes:KnownBBoxList=None, history_length=10):
         reader = skvideo.io.FFmpegReader(path)
         writer = skvideo.io.FFmpegWriter(output_path)
         frame_idx = 0
-        for frame in tqdm(reader.nextFrame(), total = len(data)):
+        for frame in tqdm(reader.nextFrame(), total = len(data), desc="Rendering video"):
             if frame_idx>=len(data):
                 break
             detections = data[frame_idx]
@@ -60,9 +61,27 @@ class VideoAnnotator:
                 img = self.frame_preprocessing(img)
 
             additional_data = None
+            # TODO move it to draw? un-import cv2
             if known_bboxes is not None:
-                additional_data = [known_bboxes.get_group_id(frame_idx, bbox) for bbox in detections]
-                additional_data = ["-" if a is None else str(a) for a in additional_data]
+                additional_data = [known_bboxes.get_group_id(frame_idx, bbox, history_length=history_length) for bbox in detections]
+                history_data = [None if a is None else a[1] for a in additional_data]
+
+                img = img.to_rgb()
+                for bbox_history in history_data:
+                    point = bbox_history[0][0].center
+                    x1, y1 = int(point[0]),int(point[1])
+
+                    for entry,fid in bbox_history:
+                        point = entry.center
+                        x2, y2 = int(point[0]),int(point[1])
+                        cv2.line(img, (x1,y1),(x2,y2), (255,0,0),1)
+                        cv2.rectangle(img, (entry.x1,entry.y1),(entry.x2,entry.y2), (120,120,120),1)
+                        cv2.putText(img, f"{fid}",(x2,y2),  cv2.FONT_HERSHEY_SIMPLEX , 0.5, (235,255,235), 1)
+                        x1=x2
+                        y1=y2
+                    
+                img = Image.from_rgb_array(img)
+                additional_data = ["-" if a is None else str(a[0]) for a in additional_data]
             img = detections.draw_on(img, additional_data = additional_data).to_rgb()
 
             writer.writeFrame(img)

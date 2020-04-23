@@ -29,6 +29,10 @@ class BBox:
         self.x2 = max(min(max_x, self.x2), min_x)
         self.y2 = max(min(max_y, self.y2), min_y)
 
+    @property
+    def center(self):
+        return (self.x1+(self.x2-self.x1)/2,self.y1+(self.y2-self.y1)/2)
+
     def iou(self, other_bbox):
         # calculate intersection
         xA = max(self.x1, other_bbox.x1)
@@ -48,4 +52,4 @@ class BBox:
         return iou
 
     def __repr__(self):
-        return f"BBox [({self.x1:0.2f},{self.y1:0.2f})-({self.x2:0.2f}),{self.y2:0.2f}) score={self.score:0.2f} class={self.class_id}/{self.class_name}] "
+        return f"BBox [({self.x1:0.2f},{self.y1:0.2f})-({self.x2:0.2f},{self.y2:0.2f}) score={self.score:0.2f} class={self.class_id}/{self.class_name}] "

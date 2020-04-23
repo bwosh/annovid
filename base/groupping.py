@@ -20,10 +20,20 @@ class KnownBBox:
         return len(self.full_bbox_history)
 
     def contains(self, frame_index:int, bbox:BBox):
-        for bb,idx in self.full_bbox_history:
-            if bb.equals(bbox) and idx==frame_index: 
+        for bb, idx in self.full_bbox_history:
+            if idx==frame_index and bb.equals(bbox):  
                 return True
+            if idx > frame_index:
+                return False
         return False
+
+    def get_history(self, frame_index:int, bbox:BBox, history_length:int):
+        result = []
+        for hist_index, (bb, idx) in enumerate(self.full_bbox_history):
+            if idx==frame_index and bb.equals(bbox): 
+                start = max(0, hist_index-history_length) 
+                return self.full_bbox_history[start:hist_index+1]
+        return result
 
     def get_match_score(self, frame_index:int, other_bbox:BBox, allowed_history_length=1):
         loops = min(allowed_history_length, len(self.bbox_history))
@@ -52,10 +62,13 @@ class KnownBBoxList:
     def __getitem__(self, index):
         return self.data[index]
 
-    def get_group_id(self, frame_index:int, bbox:BBox):
+    def get_group_id(self, frame_index:int, bbox:BBox, history_length = None):
         for g_idx, group in enumerate(self.data):
             if group.contains(frame_index, bbox):
-                return g_idx
+                if history_length is None:
+                    return g_idx
+                else:
+                    return g_idx, group.get_history(frame_index, bbox, history_length)
         return None
 
     def __repr__(self):
@@ -71,7 +84,7 @@ class BBoxGroupping:
 
         # Gether boxes
         known_boxes = KnownBBoxList()
-        for frame_id, frame_with_detections in enumerate(tqdm(self.data)):
+        for frame_id, frame_with_detections in enumerate(tqdm(self.data, desc="Groupping")):
             for bbox_idx, bbox in enumerate(frame_with_detections):
                 # find matching known box
                 matching_known_box_index = None
@@ -82,6 +95,7 @@ class BBoxGroupping:
                     match_score = kb.get_match_score(frame_id, bbox, history_length)
                     if match_score > iou_threshold and match_score>best_score:
                         matching_known_box_index = kb_index
+                        best_score = match_score
 
                 if matching_known_box_index is not None:
                     known_boxes[matching_known_box_index].add_new_apperance(frame_id, bbox)
