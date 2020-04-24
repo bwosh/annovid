@@ -14,7 +14,7 @@ class KnownBBox:
         self.bbox_history.append(new_entry)
         self.full_bbox_history.append(new_entry)
         self.bbox_history = self.bbox_history[-self.history_length:]
-        # TODO add interpolation for missing frames ?
+        # TODO [IMPROVEMENT] add interpolation for missing frames ?
 
     def get_total_occurences(self):
         return len(self.full_bbox_history)
@@ -41,7 +41,7 @@ class KnownBBox:
         for i in range(loops):
             historical_bbox, historical_frame  = self.bbox_history[-i]
 
-            if historical_frame<frame_index-allowed_history_length:
+            if historical_frame>=frame_index-allowed_history_length:
                 iou = historical_bbox.iou(other_bbox)
                 if iou>0.0:
                     return iou

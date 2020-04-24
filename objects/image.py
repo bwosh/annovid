@@ -101,4 +101,4 @@ class Image:
             
         return Image.from_rgb_array(result), BBox(ox, oy, ox+w, oy+h, -1, "CROP", 1.0)
 
-    # TODO merge images (one big image with overview)
+    # TODO [FEATURE] merge images (one big image with overview)

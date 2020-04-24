@@ -61,7 +61,7 @@ class VideoAnnotator:
                 img = self.frame_preprocessing(img)
 
             additional_data = None
-            # TODO move it to draw? un-import cv2
+            # TODO [REFACTOR] move it to draw? un-import cv2
             if known_bboxes is not None:
                 additional_data = [known_bboxes.get_group_id(frame_idx, bbox, history_length=history_length) for bbox in detections]
                 history_data = [None if a is None else a[1] for a in additional_data]
@@ -71,12 +71,13 @@ class VideoAnnotator:
                     point = bbox_history[0][0].center
                     x1, y1 = int(point[0]),int(point[1])
 
-                    for entry,fid in bbox_history:
+                    for depth,(entry,fid) in enumerate(bbox_history):
+                        depth_score = 0
+                        if len(bbox_history)>1:
+                            depth_score = int(255*(depth / (len(bbox_history)-1)))
                         point = entry.center
                         x2, y2 = int(point[0]),int(point[1])
-                        cv2.line(img, (x1,y1),(x2,y2), (255,0,0),1)
-                        cv2.rectangle(img, (entry.x1,entry.y1),(entry.x2,entry.y2), (120,120,120),1)
-                        cv2.putText(img, f"{fid}",(x2,y2),  cv2.FONT_HERSHEY_SIMPLEX , 0.5, (235,255,235), 1)
+                        cv2.line(img, (x1,y1),(x2,y2), (depth_score,0,0),1)
                         x1=x2
                         y1=y2
                     
@@ -151,5 +152,4 @@ class VideoAnnotator:
 
         return img
 
-    # TODO tracking lines
-    # TODO applying insight video (plots on videos)
+    # TODO [FEATURE] applying insight video (plots on videos)

@@ -19,7 +19,16 @@ Check samples below for an idea:
 **Plot of object count**:  
 ![plot](./assets/plot.png)
 
-**TODO Simple calculation of IOU (Intersection over Union) of two boxes**:
+**Video bboxes groupping & tracking**
+![tracking](./assets/tracking.png)
+
+**Simple calculation of IOU (Intersection over Union) of two boxes**:
+
+```python
+ a = BBox(1,1,10,10, ... ) 
+ b = BBox(2,2,11,11, ... ) 
+ iou = a.iou(b)
+```
 
 **Ultra-quick baseline annotations**:  
 ![bbox sample](./assets/bbox.png)
